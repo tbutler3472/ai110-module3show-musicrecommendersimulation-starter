@@ -73,10 +73,15 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     valence_preference = user_prefs.get("valence", 0.5)
     valence_similarity = 1 - abs(song["valence"] - valence_preference)
 
-    genre_points = 30 * genre_match
-    mood_points = 30 * mood_match
-    energy_points = 20 * energy_similarity
-    valence_points = 20 * valence_similarity
+    genre_weight = 30
+    mood_weight = 30
+    energy_weight = 20
+    valence_weight = 20
+
+    genre_points = genre_weight * genre_match
+    mood_points = mood_weight * mood_match
+    energy_points = energy_weight * energy_similarity
+    valence_points = valence_weight * valence_similarity
     score = genre_points + mood_points + energy_points + valence_points
 
     reasons = [
