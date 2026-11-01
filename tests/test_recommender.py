@@ -1,4 +1,4 @@
-from src.recommender import Song, UserProfile, Recommender
+from src.recommender import Song, UserProfile, Recommender, recommend_songs
 
 def make_small_recommender() -> Recommender:
     songs = [
@@ -59,3 +59,41 @@ def test_explain_recommendation_returns_non_empty_string():
     explanation = rec.explain_recommendation(user, song)
     assert isinstance(explanation, str)
     assert explanation.strip() != ""
+
+
+def test_recommend_songs_penalizes_artists_already_selected():
+    user_prefs = {
+        "genre": "rock",
+        "mood": "happy",
+        "energy": 0.8,
+        "valence": 0.8,
+    }
+    songs = [
+        {"id": 1, "artist": "Artist One", "genre": "rock", "mood": "happy", "energy": 0.8, "valence": 0.8},
+        {"id": 2, "artist": "Artist One", "genre": "rock", "mood": "happy", "energy": 0.8, "valence": 0.65},
+        {"id": 3, "artist": "Artist Two", "genre": "rock", "mood": "happy", "energy": 0.8, "valence": 0.5},
+    ]
+
+    results = recommend_songs(user_prefs, songs, k=3)
+
+    assert [song["id"] for song, _, _ in results] == [1, 3, 2]
+    assert results[1][1] == 94
+    assert "diversity penalty (-15.00 points)" in results[2][2]
+
+
+def test_recommend_songs_floors_scores_at_zero():
+    user_prefs = {
+        "genre": "rock",
+        "mood": "happy",
+        "energy": 0,
+        "valence": 0,
+    }
+    songs = [
+        {"id": 1, "artist": "Same Artist", "genre": "other", "mood": "sad", "energy": 0.8, "valence": 0.8},
+        {"id": 2, "artist": "Same Artist", "genre": "other", "mood": "sad", "energy": 0.8, "valence": 0.8},
+    ]
+
+    results = recommend_songs(user_prefs, songs, k=2)
+
+    assert results[1][1] == 0
+    assert "diversity penalty (-15.00 points)" in results[1][2]

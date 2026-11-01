@@ -2,7 +2,6 @@
 
 ## Project Summary
 
-## Project Summary
 
 In this project, I created a music recommendation system that recommends songs based on a user's musical preferences. The system uses features like genre, mood, energy, and valence to calculate how closely each song matches what the user is looking for. It then ranks the songs based on their scores and recommends the top five songs. I also tested the system using different user profiles to see how changing the preferences affected the recommendations.
 
@@ -34,12 +33,12 @@ The Recommender will use a weighted scoring system to calculate how closely each
 
 Choosing Recommendations
 
-Once each song receives a score, the system will rank the songs from highest to lowest. The songs with the highest scores will be recommended first because they best match the user's musical preferences.
+The system selects recommendations one at a time using the weighted score. After an artist has been selected, another song by that artist receives a 15-point diversity penalty while the next selection is made. The adjusted score is floored at zero, and the explanation identifies when the penalty applies.
 You can include a simple diagram or bullet list if helpful.
 
 Algorithm Recipe
 
-The recommendation system will use a weighted scoring algorithm to determine which songs best match the user's preferences. Genre and mood will each account for 30% of the score, while energy and valence will each account for 20%. Genre and mood will receive a score of 1 for a match and 0 for a mismatch. Energy and valence will be scored based on how close their values are to the user's preferences using the formula 1 - |Song Value - User Preference|. The system will then calculate a total score out of 100 for each song and rank them from highest to lowest to recommend the top matches.
+The recommendation system uses a weighted scoring algorithm to determine which songs best match the user's preferences. Genre and mood each account for 30% of the score, while energy and valence each account for 20%. Genre and mood receive a score of 1 for a match and 0 for a mismatch. Energy and valence are scored based on how close their values are to the user's preferences using the formula 1 - |Song Value - User Preference|. It selects recommendations in order, subtracting 15 points from songs by artists already selected and never allowing a final score below zero. This encourages variety without changing the feature weights.
 
 Potential Biases
 
@@ -226,5 +225,4 @@ Write 1 to 2 paragraphs here about what you learned:
 In this project, I learned how music recommendation systems use different features to recommend songs based on what a user likes. I also learned how the scoring system works by comparing the user's preferences with the songs in the dataset. One thing I found interesting was how changing the weights affected the recommendations and caused some songs to rank higher than others.
 
 Another thing I learned was how bias can affect the recommendations depending on the data being used. Since my dataset only has 20 songs, the system is limited in what it can recommend. This project helped me understand how music recommendation apps work and how the way they score songs can affect what users are recommended.
-
 

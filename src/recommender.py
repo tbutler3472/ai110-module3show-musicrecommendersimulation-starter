@@ -94,13 +94,30 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     return score, reasons
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
-    """Return the top-k songs ranked by their recommendation scores."""
+    """Return top-k songs, applying a diversity penalty to repeated artists."""
     recommendations = []
+    remaining_songs = list(songs)
+    selected_artists = set()
 
-    for song in songs:
-        score, reasons = score_song(user_prefs, song)
-        explanation = "; ".join(reasons)
-        recommendations.append((song, score, explanation))
+    while remaining_songs and len(recommendations) < k:
+        best_index = 0
+        best_score = -1
+        best_reasons = []
 
-    recommendations.sort(key=lambda recommendation: recommendation[1], reverse=True)
-    return recommendations[:k]
+        for index, song in enumerate(remaining_songs):
+            score, reasons = score_song(user_prefs, song)
+            penalty = 15 if song["artist"] in selected_artists else 0
+            adjusted_score = max(0, score - penalty)
+
+            if adjusted_score > best_score:
+                if penalty:
+                    reasons.append(f"diversity penalty (-{penalty:.2f} points)")
+                best_index = index
+                best_score = adjusted_score
+                best_reasons = reasons
+
+        best_song = remaining_songs.pop(best_index)
+        recommendations.append((best_song, best_score, "; ".join(best_reasons)))
+        selected_artists.add(best_song["artist"])
+
+    return recommendations
